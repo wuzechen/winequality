@@ -1,0 +1,54 @@
+{
+  "settings": {
+    "index": {
+      "number_of_shards": "2",
+      "number_of_replicas":"1",
+      "refresh_interval": "5s"
+    }
+  },
+  "mappings": {
+    "wine":{
+      "properties":{
+        "type": {
+          "type":"integer"
+        },
+        "fixed.acidity": {
+          "type":"float"
+        },
+        "volatile.acidity": {
+          "type":"float"
+        },
+        "citric.acid": {
+          "type":"float"
+        },
+        "residual.sugar": {
+          "type":"float"
+        },
+        "chlorides": {
+          "type":"float"
+        },
+        "free.sulfur.dioxide": {
+          "type":"float"
+        },
+        "total.sulfur.dioxide": {
+          "type":"float"
+        },
+        "density": {
+          "type":"float"
+        },
+        "pH": {
+          "type":"float"
+        },
+        "sulphates": {
+          "type":"float"
+        },
+        "alcohol": {
+          "type":"float"
+        },
+        "quality": {
+          "type":"float"
+        }
+      }
+    }
+  }
+}
