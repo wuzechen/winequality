@@ -5,17 +5,17 @@ import pandas as pd
 from sklearn import preprocessing
 import certifi
 
-def initData():
-    data = pd.read_csv('./data/wine_train.csv')
+def initData(path):
+    data = pd.read_csv(path)
     # read the raw data
-    print(data.head())
+    print('{0} loaded'.format(path))
     return data
 
 def checkNullValue(data):
     # check the data if has null value -> no null value -> clean data
     print("data has null value? {0}".format(data.isnull().any().any()))
 
-def dataCorrelation(data):
+def dataCorrelation(data, isSave):
     # from name, maybe fixed.acidity & volatile.acidity & citric.acid are highly correlated -> false
     # maybe free.sulfur.dioxide & total.sulfur.dioxide are highly correlated -> false
     # check the data's correlation
@@ -30,13 +30,14 @@ def dataCorrelation(data):
     # volatile.acidity is negative correlate to total.sulfur.dioxide
 
     # save to file
-    correlation.to_csv('./result/data_correlation.csv')
+    if isSave:
+        correlation.to_csv('./result/data_correlation.csv')
     print('data_correlation.csv has saved')
 
-def dataNormalization(data):
+def dataNormalization(data, isSave):
     # change wine type w to 0 and r to 1
     data['type'] = data['type'].apply(lambda x: 1 if x=='R' else 0)
-    print(data.head())
+    # print(data.head())
 
     # before upload data to elasticsearch, do the feature scaling
     # set the rang between 0 and 1
@@ -46,10 +47,11 @@ def dataNormalization(data):
     x_scaled = min_max_scaler.fit_transform(data)
     columns = data.columns
     data = DataFrame(x_scaled, columns=columns)
-    print(data.head())
+    # print(data.head())
 
-    # save scaled data to file
-    data.to_csv('./result/train_data_scaled.csv', index=False)
+    if isSave:
+        # save scaled data to file
+        data.to_csv('./result/train_data_scaled.csv', index=False)
     print('data normalized')
     return data
 
@@ -87,12 +89,26 @@ def uploadElasticearch(data):
     res = bulk(es, actions=body)
     print('{0} data has uploaded to elasticsearch'.format(res))
 
+def initNormailzedTrainData():
+    return dataNormalization(initTrainData(), False)
+
+def initNormailzedTestData():
+    return dataNormalization(initTestData(), False)
+
+def initTestData():
+    return initData('./data/wine_test.csv')
+
+def initTrainData():
+    return initData('./data/wine_train.csv')
+
+
 
 
 if __name__ == '__main__':
-    data = initData()
-    dataCorrelation(data)
-    data = dataNormalization(data)
+    data = initTrainData()
+    # dataCorrelation(data, False)
+    data = dataNormalization(data, False)
+    data.info()
     # uploadElasticearch(data)
     # now you can check the basic data status on elasticsearch
     # https://5ad49321f5849cb64b080b8849cb7dfb.us-west-2.aws.found.io:9243
