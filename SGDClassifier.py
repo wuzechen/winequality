@@ -7,7 +7,7 @@ from sklearn.metrics import classification_report
 import time
 from sklearn.externals import joblib
 
-if __name__ == '__main__':\
+if __name__ == '__main__':
     # do the same thing as RFC
     data = RFC.prepareRFC(data_explore.initNormailzedTrainData())
     testData = data_explore.initNormailzedTestData()
