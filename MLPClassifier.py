@@ -30,4 +30,14 @@ if __name__ == '__main__':
 
     # then use GridSearchCV to tuning the param, do the same thing as RFC & sgdc
     # SVM, Logistic Regression, Least-Squares, Boosting
-    param_grid = {}
+    #
+    param_grid = {'hidden_layer_sizes':[(100,), (13,13,13)],
+                  'activation':['identity', 'logistic', 'tanh', 'relu'],
+                  'solver':['lbfgs', 'sgd', 'adam'],
+                  'alpha':[0.0001, 0.001],
+                  'batch_size':['auto'],
+                  'learning_rate':['constant', 'invscaling', 'adaptive'],
+                  'learning_rate_init':[0.001],
+                  'power_t':[0.5],
+                  'max_iter':[200, 400, 600],
+                  }
