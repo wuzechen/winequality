@@ -65,8 +65,8 @@ if __name__ == '__main__':
     # Best Model Parameter: {'activation': 'relu', 'alpha': 0.0001, 'hidden_layer_sizes': (100,), 'learning_rate': 'invscaling',
     #             'learning_rate_init': 0.001, 'max_iter': 2000, 'power_t': 0.5, 'solver': 'adam'}
 
-    # nn = MLPClassifier(activation='relu', alpha=0.0001, hidden_layer_sizes=(100,),learning_rate='invscaling',
-    #                    learning_rate_init=0.001, max_iter=2000, solver='adam', verbose=True)
+    nn = MLPClassifier(activation='relu', alpha=0.0001, hidden_layer_sizes=(100,),learning_rate='invscaling',
+                       learning_rate_init=0.001, max_iter=2000, solver='adam', verbose=True)
     #
     # nn.fit(X_train, y_train)
     # predict_nn = nn.predict(X_test)
@@ -120,20 +120,44 @@ if __name__ == '__main__':
                   'power_t':[0.5],#only work for sgd and invscaling
                   'max_iter':[800, 1000, 1500, 2000]}
 
-    nn_grid = GridSearchCV(estimator=nn,
-                           param_grid=param_grid,
-                           scoring="accuracy",
-                           cv=3,  # cross-validation
-                           n_jobs=4)  # number of core
-
-    start = time.clock()
-    nn_grid.fit(X_train, y_train)
-
-    end = time.clock()
-    cost = end - start
-    print('cost {0}s'.format(cost))
-    forest_grid_best = nn_grid.best_estimator_
-    print("Best Model Parameter: ", nn_grid.best_params_)
+    # nn_grid = GridSearchCV(estimator=nn,
+    #                        param_grid=param_grid,
+    #                        scoring="accuracy",
+    #                        cv=3,  # cross-validation
+    #                        n_jobs=4)  # number of core
+    #
+    # start = time.clock()
+    # nn_grid.fit(X_train, y_train)
+    #
+    # end = time.clock()
+    # cost = end - start
+    # print('cost {0}s'.format(cost))
+    # forest_grid_best = nn_grid.best_estimator_
+    # print("Best Model Parameter: ", nn_grid.best_params_)
 
     # Best Model Parameter:  {'activation': 'relu', 'alpha': 0.0001, 'hidden_layer_sizes': (100, 100, 100, 100),
     # 'learning_rate': 'invscaling', 'learning_rate_init': 0.0001, 'max_iter': 800, 'power_t': 0.5, 'solver': 'adam'}
+    nn = MLPClassifier(activation='relu', alpha=0.0001, hidden_layer_sizes=(1000, 1000, 1000),
+                       learning_rate='invscaling', learning_rate_init=0.0001, max_iter=800, solver='adam', verbose=True)
+    nn.fit(X_train, y_train)
+    predict_nn = nn.predict(X_test)
+    print(classification_report(y_test, predict_nn))
+    # after 224 iter
+    # Iteration 224, loss = 0.14691077
+    # Training loss did not improve more than tol=0.000100 for two consecutive epochs. Stopping.
+    #              precision    recall  f1-score   support
+    #
+    #           0       0.91      0.92      0.92       902
+    #           1       0.62      0.57      0.59       198
+    #
+    # avg / total       0.86      0.86      0.86      1100
+
+    #  then i try 1000, 1000, 1000 's NN
+    #              precision    recall  f1-score   support
+    #
+    #           0       0.92      0.93      0.93       902
+    #           1       0.66      0.66      0.66       198
+    #
+    # avg / total       0.88      0.88      0.88      1100
+
+
