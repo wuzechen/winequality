@@ -10,27 +10,27 @@
     "wine":{
       "properties":{
         "type": {
-          "type":"integer"
+          "type":"keyword"
         },
-        "fixed.acidity": {
+        "fixed_acidity": {
           "type":"float"
         },
-        "volatile.acidity": {
+        "volatile_acidity": {
           "type":"float"
         },
-        "citric.acid": {
+        "citric_acid": {
           "type":"float"
         },
-        "residual.sugar": {
+        "residual_sugar": {
           "type":"float"
         },
         "chlorides": {
           "type":"float"
         },
-        "free.sulfur.dioxide": {
+        "free_sulfur_dioxide": {
           "type":"float"
         },
-        "total.sulfur.dioxide": {
+        "total_sulfur_dioxide": {
           "type":"float"
         },
         "density": {
