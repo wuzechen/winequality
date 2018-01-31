@@ -4,6 +4,7 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import classification_report
 import time
 import pandas as pd
+from sklearn.externals import joblib
 
 if __name__ == '__main__':
     # do the same thing as RFC & SGDC
@@ -82,17 +83,81 @@ if __name__ == '__main__':
     #
     # avg / total       0.81      0.83      0.81      1100
 
-    nn_grid = GridSearchCV(estimator=nn,
-                           param_grid=param_grid,
-                           scoring="accuracy",
-                           cv=3,  # cross-validation
-                           n_jobs=4)  # number of core
+    # nn_grid = GridSearchCV(estimator=nn,
+    #                        param_grid=param_grid,
+    #                        scoring="accuracy",
+    #                        cv=3,  # cross-validation
+    #                        n_jobs=4)  # number of core
+    #
+    # start = time.clock()
+    # nn_grid.fit(X_train, y_train)
+    #
+    # end = time.clock()
+    # cost = end - start
+    # print('cost {0}s'.format(cost))
+    # forest_grid_best = nn_grid.best_estimator_
+    # print("Best Model Parameter: ", nn_grid.best_params_)
 
-    start = time.clock()
-    nn_grid.fit(X_train, y_train)
+    #Best Model Parameter:  {'activation': 'tanh', 'alpha': 0.001, 'hidden_layer_sizes': (13, 13, 13, 13),
+    # 'learning_rate': 'adaptive', 'learning_rate_init': 0.001, 'max_iter': 800, 'power_t': 0.5, 'solver': 'adam'}
 
-    end = time.clock()
-    cost = end - start
-    print('cost {0}s'.format(cost))
-    forest_grid_best = nn_grid.best_estimator_
-    print("Best Model Parameter: ", nn_grid.best_params_)
+    #              precision    recall  f1-score   support
+    #
+    #           0       0.88      0.94      0.91       902
+    #           1       0.60      0.39      0.48       198
+    #
+    # avg / total       0.83      0.84      0.83      1100
+
+
+    # nn = MLPClassifier(activation='relu', alpha=0.001, hidden_layer_sizes=(1000, 1000, 1000),
+    #                    learning_rate='adaptive', learning_rate_init=0.001, max_iter=800, solver='adam', verbose=True)
+    #
+    # nn.fit(X_train, y_train)
+    # predict_nn = nn.predict(X_test)
+    # print(classification_report(y_test, predict_nn))
+
+    #activation='tanh', alpha=0.001, hidden_layer_sizes=(1000, 1000, 1000, 1000),learning_rate='adaptive',
+    # learning_rate_init=0.001, max_iter=800, solver='adam',
+    #              precision    recall  f1-score   support
+    #
+    #           0       0.92      0.92      0.92       902
+    #           1       0.64      0.62      0.63       198
+    #
+    # avg / total       0.87      0.87      0.87      1100
+
+    # activation='relu', alpha=0.001, hidden_layer_sizes=(1000, 1000, 1000),
+    # learning_rate='adaptive', learning_rate_init=0.001, max_iter=800, solver='adam'
+    #              precision    recall  f1-score   support
+    #
+    #           0       0.92      0.93      0.93       902
+    #           1       0.66      0.63      0.65       198
+    #
+    # avg / total       0.87      0.88      0.88      1100
+
+    # activation='relu', alpha=0.0001, hidden_layer_sizes=(1000, 1000, 1000),
+    # learning_rate='adaptive', learning_rate_init=0.001, max_iter=800, solver='adam'
+    #              precision    recall  f1-score   support
+    #
+    #           0       0.93      0.91      0.92       902
+    #           1       0.62      0.68      0.65       198
+    #
+    # avg / total       0.87      0.87      0.87      1100
+
+    # so the best nn is activation='relu', alpha=0.001, hidden_layer_sizes=(1000, 1000, 1000),
+    # learning_rate='adaptive', learning_rate_init=0.001, max_iter=800, solver='adam'
+    # and let it predict the test data
+
+    testData = de.typeScaling(de.initTestData())
+
+    X, testData = de.dataMinMaxScale(X, testData)
+
+    nn = MLPClassifier(activation='relu', alpha=0.001, hidden_layer_sizes=(1000, 1000, 1000),
+                       learning_rate='adaptive', learning_rate_init=0.001, max_iter=800, solver='adam', verbose=True)
+    nn.fit(X, y)
+    joblib.dump(nn, './result/nnModel.pkl')
+    predict_nn = nn.predict(testData)
+    result = pd.Series(predict_nn)
+    print(result.value_counts())
+    result.to_csv('./result/nnResult.csv', index=False)
+    # 0    876
+    # 1    124
