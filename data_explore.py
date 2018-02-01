@@ -5,6 +5,8 @@ import pandas as pd
 from sklearn import preprocessing
 import certifi
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.feature_selection import SelectFromModel
+from sklearn.ensemble import RandomForestClassifier
 
 def initData(path):
     data = pd.read_csv(path)
@@ -148,6 +150,22 @@ def dataStandardScale(X_train, X_test):
     X_test = scaler.transform(X_test)
     return X_train, X_test
 
+def feature_importances(data):
+    data = prepareForClassifi(data)
+
+    y = data['quality']
+    X = data.drop('quality', axis=1)
+    scaler = StandardScaler()
+    X = scaler.fit_transform(X)
+    rf = RandomForestClassifier()
+    rf.fit(X, y)
+    print(rf.feature_importances_)
+    # type is not important, and the others are almost same
+    # [0.00270186  0.06940971  0.08975956  0.07691974  0.08258686  0.10819747
+    #  0.07691445  0.08216788  0.11963666  0.08249469  0.08428739  0.12492373]
+    return
+
+
 if __name__ == '__main__':
     data = initTrainData()
     # dataCorrelation(data, False)
@@ -159,3 +177,4 @@ if __name__ == '__main__':
     # https://5ad49321f5849cb64b080b8849cb7dfb.us-west-2.aws.found.io:9243
     # username wine passwd lifestyleDE
     # find the wine_data_basic dashboard
+    feature_importances(data)
