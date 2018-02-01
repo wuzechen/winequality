@@ -61,15 +61,15 @@ if __name__ == '__main__':
                                cv=3,  # cross-validation
                                n_jobs=4)  # number of core
 
-    start = time.clock()
-    print('start time is {0}'.format(start))
-    forest_grid.fit(X_train, y_train)  # fit
-
-    end = time.clock()
-    cost = end - start
-    print('cost {0}s'.format(cost))
-    forest_grid_best = forest_grid.best_estimator_
-    print("Best Model Parameter: ", forest_grid.best_params_)
+    # start = time.clock()
+    # print('start time is {0}'.format(start))
+    # forest_grid.fit(X_train, y_train)  # fit
+    #
+    # end = time.clock()
+    # cost = end - start
+    # print('cost {0}s'.format(cost))
+    # forest_grid_best = forest_grid.best_estimator_
+    # print("Best Model Parameter: ", forest_grid.best_params_)
 
     # min max scale
     # cost 5802.166018972291s
@@ -77,23 +77,55 @@ if __name__ == '__main__':
     #             'min_impurity_decrease': 0.0, 'min_impurity_split': None, 'min_samples_leaf': 1, 'min_samples_split': 2,
     #             'min_weight_fraction_leaf': 0.0, 'n_estimators': 200}
 
+    #              precision    recall  f1-score   support
+    #
+    #           0       0.91      0.97      0.94       902
+    #           1       0.80      0.55      0.65       198
+    #
+    # avg / total       0.89      0.89      0.89      1100
+    rfc = RandomForestClassifier(bootstrap=False, criterion='gini', max_depth=None, max_features=1,
+                                 max_leaf_nodes= None, min_impurity_decrease=0.0, min_impurity_split=None,
+                                 min_samples_leaf=1,min_samples_split=2,min_weight_fraction_leaf=0.0,n_estimators=200)
+    # rfc.fit(X_train, y_train)
+    # predict_rfc = rfc.predict(X_test)
+    # print(classification_report(y_test, predict_rfc))
+
+
+
+
     # standard scale
     # cost 5632.391304687952s
     # Best Model Parameter: {'bootstrap': True, 'criterion': 'gini', 'max_depth': None, 'max_features': 1, 'max_leaf_nodes': None,
     #             'min_impurity_decrease': 0.0, 'min_impurity_split': None, 'min_samples_leaf': 1, 'min_samples_split': 3,
     #             'min_weight_fraction_leaf': 0.0, 'n_estimators': 400}
+    #
+    #             precision    recall  f1-score   support
+    #
+    #           0       0.90      0.97      0.94       902
+    #           1       0.81      0.52      0.63       198
+    #
+    # avg / total       0.89      0.89      0.88      1100
 
-    rfc = RandomForestClassifier(bootstrap=False, criterion='gini', max_depth=None, max_features=1,
+    rfc = RandomForestClassifier(bootstrap=True, criterion='gini', max_depth=None, max_features=1,
                                  max_leaf_nodes= None, min_impurity_decrease=0.0, min_impurity_split=None,
-                                 min_samples_leaf=1,min_samples_split=5,min_weight_fraction_leaf=0.0,n_estimators=400)
+                                 min_samples_leaf=1,min_samples_split=3,min_weight_fraction_leaf=0.0,n_estimators=400)
     # rfc.fit(X_train, y_train)
     # predict_rfc = rfc.predict(X_test)
     # print(classification_report(y_test, predict_rfc))
 
-    # a little bit better than the default param
-    #              precision    recall  f1-score   support
-    #
-    #           0       0.91      0.97      0.94       902
-    #           1       0.82      0.54      0.65       198
-    #
-    # avg / total       0.89      0.90      0.89      1100
+    # almost same as the min max scale
+    # so let predict the test data
+    # use standard scaled data
+    testData = de.typeScaling(de.initTestData())
+
+    X, testData = de.dataStandardScale(X, testData)
+    rfc.fit(X, y)
+    # save model to file
+    joblib.dump(rfc, './result/RFCModel.pkl')
+    predict_rfc = rfc.predict(testData)
+    result = pd.Series(predict_rfc)
+    print(result.value_counts())
+    result.to_csv('./result/RFCResult.csv', index=False)
+
+    # 0   873
+    # 1   127
