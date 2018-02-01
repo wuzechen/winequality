@@ -118,14 +118,93 @@ if __name__ == '__main__':
     # use standard scaled data
     testData = de.typeScaling(de.initTestData())
 
-    X, testData = de.dataStandardScale(X, testData)
-    rfc.fit(X, y)
+    # X, testData = de.dataStandardScale(X, testData)
+    # rfc.fit(X, y)
     # save model to file
-    joblib.dump(rfc, './result/RFCModel.pkl')
-    predict_rfc = rfc.predict(testData)
-    result = pd.Series(predict_rfc)
-    print(result.value_counts())
-    result.to_csv('./result/RFCResult.csv', index=False)
+    # joblib.dump(rfc, './result/RFCModel_GN.pkl')
+    # predict_rfc = rfc.predict(testData)
+    # result = pd.Series(predict_rfc)
+    # print(result.value_counts())
+    # result.to_csv('./result/RFCResult_GN.csv', index=False)
 
-    # 0   873
-    # 1   127
+    #0    874
+    #1    126
+
+
+    # then predtic the quality rank
+    data = de.typeScaling(de.initTrainData())
+
+    y = data['quality']
+    X = data.drop('quality', axis=1)
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=31)
+
+    # feature scaling
+    X_train, X_test = de.dataMinMaxScale(X_train, X_test)
+    # X_train, X_test = de.dataStandardScale(X_train, X_test)
+
+    rfc = RandomForestClassifier()
+    # rfc.fit(X_train, y_train)
+    # predict_rfc = rfc.predict(X_test)
+    # print(classification_report(y_test, predict_rfc))
+
+    # StandardScale
+    #              precision    recall  f1-score   support
+    #
+    #           3       0.00      0.00      0.00         5
+    #           4       0.40      0.13      0.20        31
+    #           5       0.66      0.69      0.68       390
+    #           6       0.64      0.71      0.67       476
+    #           7       0.59      0.52      0.55       159
+    #           8       0.88      0.39      0.55        38
+    #           9       0.00      0.00      0.00         1
+    #
+    # avg / total       0.64      0.64      0.63      1100
+
+    # min max scaled
+    #              precision    recall  f1-score   support
+    #
+    #           3       0.00      0.00      0.00         5
+    #           4       0.20      0.10      0.13        31
+    #           5       0.67      0.69      0.68       390
+    #           6       0.63      0.70      0.66       476
+    #           7       0.59      0.52      0.55       159
+    #           8       0.93      0.34      0.50        38
+    #           9       0.00      0.00      0.00         1
+    #
+    # avg / total       0.63      0.64      0.63      1100
+
+
+    param_grid = {'n_estimators': [100, 200, 300, 400],
+                      'criterion': ['gini', 'entropy'],
+                      'max_depth': [5, 10, 20, None],
+                      'min_samples_split': [2, 3, 5, 10],
+                      'min_samples_leaf': [1, 2, 3, 5, 10],
+                      'min_weight_fraction_leaf' : [0.],
+                      'max_features': [1, 3, 10],
+                      'max_leaf_nodes': [None],
+                      'min_impurity_decrease': [0.],
+                      'min_impurity_split': [None],
+                      'bootstrap': [True, False]}
+
+    forest_grid = GridSearchCV(estimator=rfc,
+                               param_grid=param_grid,
+                               scoring="accuracy",
+                               cv=3,  # cross-validation
+                               n_jobs=4)  # number of core
+
+    start = time.clock()
+    print('start time is {0}'.format(start))
+    forest_grid.fit(X_train, y_train)  # fit
+
+    end = time.clock()
+    cost = end - start
+    print('cost {0}s'.format(cost))
+    forest_grid_best = forest_grid.best_estimator_
+    print("Best Model Parameter: ", forest_grid.best_params_)
+
+    # min max scaled grid search
+    # cost 7690.306514894764s
+    # Best Model Parameter:  {'bootstrap': False, 'criterion': 'entropy', 'max_depth': 20, 'max_features': 1,
+    # 'max_leaf_nodes': None, 'min_impurity_decrease': 0.0, 'min_impurity_split': None, 'min_samples_leaf': 3,
+    # 'min_samples_split': 3, 'min_weight_fraction_leaf': 0.0, 'n_estimators': 400}

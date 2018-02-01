@@ -113,6 +113,113 @@ if __name__ == '__main__':
     # now use this model to predict the data in wine_test.csv
     testData = de.typeScaling(de.initTestData())
 
+    # X, testData = de.dataMinMaxScale(X, testData)
+
+    # sgdc = SGDClassifier(loss='log', alpha=0.00001, max_iter=200, penalty='l1', verbose=True)
+    # sgdc.fit(X, y)
+    # save model to file
+    # joblib.dump(sgdc, './result/SGDCModel.pkl')
+    # predict_sgdc = sgdc.predict(testData)
+    # result = pd.Series(predict_sgdc)
+    # print(result.value_counts())
+    # testData = de.initTestData()
+    # testData.insert(12, 'quality', result)
+    # testData.to_csv('./result/SGDCResult_GN.csv', index=False)
+    # 0    892
+    # 1    108
+
+    # then we do not classifi the good/normal, but the rank of quality
+    data = de.typeScaling(de.initTrainData())
+
+    y = data['quality']
+    X = data.drop('quality', axis=1)
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=31)
+
+    # feature scaling
+    # X_train, X_test = de.dataMinMaxScale(X_train, X_test)
+    X_train, X_test = de.dataStandardScale(X_train, X_test)
+
+    # start training with default param
+    sgdc = SGDClassifier()
+    # sgdc.fit(X_train, y_train)
+    # predict_sgdc = sgdc.predict(X_test)
+    # print(classification_report(y_test, predict_sgdc))
+
+    #  the accuracy of predict quality rank is low when use default param
+    #              precision    recall  f1-score   support
+    #
+    #           3       0.00      0.00      0.00         5
+    #           4       0.22      0.06      0.10        31
+    #           5       0.49      0.54      0.52       390
+    #           6       0.47      0.42      0.44       476
+    #           7       0.31      0.16      0.21       159
+    #           8       0.10      0.42      0.17        38
+    #           9       0.00      0.00      0.00         1
+    #
+    # avg / total       0.43      0.41      0.41      1100
+
+    param_grid = {'loss': ['hinge', 'log', 'squared_loss', 'epsilon_insensitive'],
+                  'penalty': ['l2', 'l1', 'elasticnet'], #ridge, lasso, elasticnet
+                  'alpha': [ 0.00001, 0.0001, 0.001, 0.01, 1],
+                  'max_iter': [10, 100, 200, 300, 400, 500, 600, 700],
+                  'learning_rate':['optimal']}
+
+    # sgdc_grid = GridSearchCV(estimator=sgdc,
+    #                          param_grid=param_grid,
+    #                          scoring='accuracy',
+    #                          cv=3,  # cross-validation
+    #                          n_jobs=4)  # number of core
+    #
+    # start = time.clock()
+    # sgdc_grid.fit(X_train, y_train)
+    #
+    # end = time.clock()
+    # cost = end - start
+    # print('cost {0}s'.format(cost))
+    # forest_grid_best = sgdc_grid.best_estimator_
+    # print("Best Model Parameter: ", sgdc_grid.best_params_)
+
+    # standard scaled data
+    # cost 432.6251537496871s
+    # Best Model Parameter:  {'alpha': 0.0001, 'learning_rate': 'optimal', 'loss': 'log', 'max_iter': 500, 'penalty': 'l2'}
+    #              precision    recall  f1-score   support
+    #
+    #           3       0.00      0.00      0.00         5
+    #           4       0.00      0.00      0.00        31
+    #           5       0.59      0.62      0.61       390
+    #           6       0.53      0.70      0.60       476
+    #           7       0.51      0.18      0.27       159
+    #           8       0.00      0.00      0.00        38
+    #           9       0.00      0.00      0.00         1
+    #
+    # avg / total       0.51      0.55      0.51      1100
+
+    # min max scaled data
+    # cost 381.7967895500761s
+    # Best Model Parameter:  {'alpha': 1e-05, 'learning_rate': 'optimal', 'loss': 'log', 'max_iter': 600, 'penalty': 'l1'}
+    #              precision    recall  f1-score   support
+    #
+    #           3       0.00      0.00      0.00         5
+    #           4       0.00      0.00      0.00        31
+    #           5       0.59      0.62      0.61       390
+    #           6       0.51      0.68      0.59       476
+    #           7       0.47      0.16      0.24       159
+    #           8       0.00      0.00      0.00        38
+    #           9       0.00      0.00      0.00         1
+    #
+    # avg / total       0.50      0.54      0.50      1100
+
+
+    sgdc = SGDClassifier(loss='log', alpha=0.0001, max_iter=500, penalty='l2', verbose=True)
+    # sgdc.fit(X_train, y_train)
+    # predict_sgdc = sgdc.predict(X_test)
+    # print(classification_report(y_test, predict_sgdc))
+
+    # the best model for predict in sgdc is standard scaled data and loss='log', alpha=0.0001, max_iter=500, penalty='l2'
+
+    testData = de.typeScaling(de.initTestData())
+
     X, testData = de.dataMinMaxScale(X, testData)
 
     sgdc = SGDClassifier(loss='log', alpha=0.00001, max_iter=200, penalty='l1', verbose=True)
@@ -122,9 +229,10 @@ if __name__ == '__main__':
     predict_sgdc = sgdc.predict(testData)
     result = pd.Series(predict_sgdc)
     print(result.value_counts())
-    result.to_csv('./result/SGDCResult.csv', index=False)
-    # 0    950
-    # 1     50
+    testData = de.initTestData()
+    testData.insert(12, 'quality', result)
+    testData.to_csv('./result/SGDCResult.csv', index=False)
 
-
-
+    # 6    625
+    # 5    313
+    # 7     62
