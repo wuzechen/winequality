@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
     # we know there are 2 kind of clusters good and normal
     y_pred = KMeans(n_clusters=7,verbose=True).fit_predict(X_train)
-    """绘图"""
+
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     ax.scatter(X_train[:, 2], X_train[:, 3], c=y_pred)

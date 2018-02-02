@@ -216,17 +216,76 @@ if __name__ == '__main__':
                   'power_t':[0.5],#only work for sgd and invscaling
                   'max_iter':[800, 1000, 1500, 2000]}
 
-    nn_grid = GridSearchCV(estimator=nn,
-                           param_grid=param_grid,
-                           scoring="accuracy",
-                           cv=3,  # cross-validation
-                           n_jobs=4)  # number of core
+    # nn_grid = GridSearchCV(estimator=nn,
+    #                        param_grid=param_grid,
+    #                        scoring="accuracy",
+    #                        cv=3,  # cross-validation
+    #                        n_jobs=4)  # number of core
+    #
+    # start = time.clock()
+    # nn_grid.fit(X_train, y_train)
+    #
+    # end = time.clock()
+    # cost = end - start
+    # print('cost {0}s'.format(cost))
+    # forest_grid_best = nn_grid.best_estimator_
+    # print("Best Model Parameter: ", nn_grid.best_params_)
 
-    start = time.clock()
-    nn_grid.fit(X_train, y_train)
+    # 1000 node per layer cost too much time to grid search, use good / normal model to predict
+    nn = MLPClassifier(activation='relu', alpha=0.001, hidden_layer_sizes=(1000, 1000, 1000),
+                       learning_rate='adaptive', learning_rate_init=0.001, max_iter=800, solver='adam', verbose=True)
 
-    end = time.clock()
-    cost = end - start
-    print('cost {0}s'.format(cost))
-    forest_grid_best = nn_grid.best_estimator_
-    print("Best Model Parameter: ", nn_grid.best_params_)
+    # nn.fit(X_train, y_train)
+    # predict_nn = nn.predict(X_test)
+    # print(classification_report(y_test, predict_nn))
+
+    # standard scaled data
+    #              precision    recall  f1-score   support
+    #
+    #           3       0.00      0.00      0.00         5
+    #           4       0.19      0.10      0.13        31
+    #           5       0.69      0.64      0.66       390
+    #           6       0.62      0.70      0.66       476
+    #           7       0.52      0.52      0.52       159
+    #           8       0.48      0.39      0.43        38
+    #           9       0.00      0.00      0.00         1
+    #
+    # avg / total       0.61      0.62      0.61      1100
+
+    # min max scaled
+    #              precision    recall  f1-score   support
+    #
+    #           3       0.00      0.00      0.00         5
+    #           4       0.19      0.10      0.13        31
+    #           5       0.59      0.69      0.63       390
+    #           6       0.54      0.53      0.53       476
+    #           7       0.41      0.40      0.41       159
+    #           8       0.00      0.00      0.00        38
+    #           9       0.00      0.00      0.00         1
+    #
+    # avg / total       0.51      0.53      0.52      1100
+
+    # so standard scaled data is better in classifi
+
+    testData = de.typeScaling(de.initTestData())
+
+    X, testData = de.dataStandardScale(X, testData)
+
+    nn = MLPClassifier(activation='relu', alpha=0.001, hidden_layer_sizes=(1000, 1000, 1000),
+                       learning_rate='adaptive', learning_rate_init=0.001, max_iter=800, solver='adam', verbose=True)
+    nn.fit(X, y)
+    joblib.dump(nn, './result/nnModel.pkl')
+    predict_nn = nn.predict(testData)
+    result = pd.Series(predict_nn)
+    print(result.value_counts())
+    testData = de.initTestData()
+    testData.insert(12, 'quality', result)
+    testData.to_csv('./result/nnResult.csv', index=False)
+
+    # 6    485
+    # 5    297
+    # 7    160
+    # 4     35
+    # 8     18
+    # 3      4
+    # 9      1
