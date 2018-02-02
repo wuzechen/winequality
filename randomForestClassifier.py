@@ -259,9 +259,11 @@ if __name__ == '__main__':
     predict_rfc = rfc.predict(testData)
     result = pd.Series(predict_rfc)
     print(result.value_counts())
-    result.to_csv('./result/RFCResult.csv', index=False)
+    testData = de.initTestData()
+    testData.insert(12, 'quality', result)
+    testData.to_csv('./result/RFCResult.csv', index=False)
 
-    # 6    586
-    # 5    314
-    # 7     96
+    # 6    588
+    # 5    310
+    # 7     98
     # 8      4
