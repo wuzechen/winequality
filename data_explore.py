@@ -175,6 +175,6 @@ if __name__ == '__main__':
     # uploadElasticearch(data)
     # now you can check the basic data status on elasticsearch
     # https://5ad49321f5849cb64b080b8849cb7dfb.us-west-2.aws.found.io:9243
-    # username wine passwd lifestyleDE
+    # username wine passwd lifestyle
     # find the wine_data_basic dashboard
     feature_importances(data)

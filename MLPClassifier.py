@@ -147,17 +147,86 @@ if __name__ == '__main__':
     # learning_rate='adaptive', learning_rate_init=0.001, max_iter=800, solver='adam'
     # and let it predict the test data
 
-    testData = de.typeScaling(de.initTestData())
-
-    X, testData = de.dataMinMaxScale(X, testData)
-
-    nn = MLPClassifier(activation='relu', alpha=0.001, hidden_layer_sizes=(1000, 1000, 1000),
-                       learning_rate='adaptive', learning_rate_init=0.001, max_iter=800, solver='adam', verbose=True)
-    nn.fit(X, y)
-    joblib.dump(nn, './result/nnModel.pkl')
-    predict_nn = nn.predict(testData)
-    result = pd.Series(predict_nn)
-    print(result.value_counts())
-    result.to_csv('./result/nnResult.csv', index=False)
+    # testData = de.typeScaling(de.initTestData())
+    #
+    # X, testData = de.dataMinMaxScale(X, testData)
+    #
+    # nn = MLPClassifier(activation='relu', alpha=0.001, hidden_layer_sizes=(1000, 1000, 1000),
+    #                    learning_rate='adaptive', learning_rate_init=0.001, max_iter=800, solver='adam', verbose=True)
+    # nn.fit(X, y)
+    # joblib.dump(nn, './result/nnModel_GN.pkl')
+    # predict_nn = nn.predict(testData)
+    # result = pd.Series(predict_nn)
+    # print(result.value_counts())
+    # result.to_csv('./result/nnResult_GN.csv', index=False)
     # 0    876
     # 1    124
+
+
+    # now predict the quality rank of wine
+    data = de.typeScaling(de.initTrainData())
+
+    y = data['quality']
+    X = data.drop('quality', axis=1)
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=31)
+
+    # feature scaling
+    X_train, X_test = de.dataMinMaxScale(X_train, X_test)
+    # X_train, X_test = de.dataStandardScale(X_train, X_test)
+
+    nn = MLPClassifier()
+    # nn.fit(X_train, y_train)
+    # predict_nn = nn.predict(X_test)
+    # print(classification_report(y_test, predict_nn))
+
+    # standard scaled default param
+    #              precision    recall  f1-score   support
+    #
+    #           3       0.00      0.00      0.00         5
+    #           4       0.20      0.06      0.10        31
+    #           5       0.62      0.69      0.66       390
+    #           6       0.55      0.63      0.59       476
+    #           7       0.52      0.35      0.42       159
+    #           8       0.33      0.03      0.05        38
+    #           9       0.00      0.00      0.00         1
+    #
+    # avg / total       0.55      0.57      0.55      1100
+
+    # min max scaled data
+    #              precision    recall  f1-score   support
+    #
+    #           3       0.00      0.00      0.00         5
+    #           4       0.00      0.00      0.00        31
+    #           5       0.60      0.61      0.60       390
+    #           6       0.52      0.70      0.60       476
+    #           7       0.45      0.18      0.26       159
+    #           8       0.00      0.00      0.00        38
+    #           9       0.00      0.00      0.00         1
+    #
+    # avg / total       0.50      0.54      0.51      1100
+
+    # then use GridSearchCV to tuning the param
+    param_grid = {'hidden_layer_sizes':[(1000, 1000), (1000, 1000, 1000), (1000, 1000, 1000)],
+                  'activation':['identity', 'logistic', 'tanh', 'relu'],
+                  'solver':['sgd', 'adam'], #lbfgs is fit data smaller than 1k, so we do not try it
+                  'alpha':[0.0001, 0.001],
+                  'learning_rate':['constant', 'invscaling', 'adaptive'], #only work for sgd
+                  'learning_rate_init':[0.001, 0.0001],
+                  'power_t':[0.5],#only work for sgd and invscaling
+                  'max_iter':[800, 1000, 1500, 2000]}
+
+    nn_grid = GridSearchCV(estimator=nn,
+                           param_grid=param_grid,
+                           scoring="accuracy",
+                           cv=3,  # cross-validation
+                           n_jobs=4)  # number of core
+
+    start = time.clock()
+    nn_grid.fit(X_train, y_train)
+
+    end = time.clock()
+    cost = end - start
+    print('cost {0}s'.format(cost))
+    forest_grid_best = nn_grid.best_estimator_
+    print("Best Model Parameter: ", nn_grid.best_params_)
