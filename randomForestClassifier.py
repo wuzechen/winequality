@@ -244,7 +244,7 @@ if __name__ == '__main__':
 
     rfc = RandomForestClassifier(bootstrap=True, criterion='entropy', max_depth=20, max_features=1,
                                  max_leaf_nodes= None, min_impurity_decrease=0.0, min_impurity_split=None,
-                                 min_samples_leaf=3,min_samples_split=3,min_weight_fraction_leaf=0.0,n_estimators=400,
+                                 min_samples_leaf=1,min_samples_split=5,min_weight_fraction_leaf=0.0,n_estimators=400,
                                  verbose=True)
     # rfc.fit(X_train, y_train)
     # predict_rfc = rfc.predict(X_test)
@@ -263,7 +263,8 @@ if __name__ == '__main__':
     testData.insert(12, 'quality', result)
     testData.to_csv('./result/RFCResult.csv', index=False)
 
-    # 6    588
+    # 6    567
     # 5    310
-    # 7     98
-    # 8      4
+    # 7    112
+    # 8      8
+    # 4      3
