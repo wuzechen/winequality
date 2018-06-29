@@ -38,6 +38,6 @@ elasitcsearch has changed to GCP and lost all result T_T
 
 ~~elasticsearch link  https://5ad49321f5849cb64b080b8849cb7dfb.us-west-2.aws.found.io:9243~~  
 
-    ~~username wine passwd lifestyle~~
+~~username wine passwd lifestyle~~
 
    ~~find the wine_data_basic dashboard~~
