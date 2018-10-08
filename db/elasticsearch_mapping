@@ -7,7 +7,7 @@
     }
   },
   "mappings": {
-    "wine":{
+    "doc":{
       "properties":{
         "type": {
           "type":"keyword"

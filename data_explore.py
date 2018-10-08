@@ -82,9 +82,9 @@ def dataStandradScaling(data, isSave):
 def uploadElasticearch(data):
     # upload to elasticsearch
     es = Elasticsearch(
-        ['YOURELASTICSEARCH'],
+        ['elasticsearch endpoint'],
         use_ssl=True,
-        http_auth=('YOURNAME', 'YOURPASS'),
+        http_auth=('username', 'password'),
         ca_certs=certifi.where()
     )
 
@@ -106,7 +106,7 @@ def uploadElasticearch(data):
         doc['quality'] = row['quality']
         line = {'_op_type': 'index',
                 '_index': 'wine_data',
-                '_type':'wine',
+                '_type':'doc',
                 '_source':doc}
         body.append(line)
 
@@ -168,13 +168,13 @@ def feature_importances(data):
 
 if __name__ == '__main__':
     data = initTrainData()
-    # dataCorrelation(data, False)
+    dataCorrelation(data, False)
     # data = dataMinMaxScaling(data, True)
     # data = dataStandradScaling(data, True)
     data.info()
-    # uploadElasticearch(data)
+    uploadElasticearch(data)
     # now you can check the basic data status on elasticsearch
-    # https://5ad49321f5849cb64b080b8849cb7dfb.us-west-2.aws.found.io:9243
-    # username wine passwd lifestyle
-    # find the wine_data_basic dashboard
+    # https://4c2e6ab8714b46f1b0067cd0f3c8d3d6.ap-northeast-1.aws.found.io:9243
+    # username wine password recruit
+    # find the wine_train_set_basic_distribution dashboard
     feature_importances(data)

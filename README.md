@@ -3,7 +3,8 @@ use wine training data to forecast the test data's quality
 
 use two kind of predict ways
 1. 2 - values    quality > 6 => 1  quality <= 6 => 0
-2. 7 - values from 3 to 9
+2. 7 - values from 3 to 9 
+3. ~~minimum-deviation~~ may be have a good result, but mis-predict means nothing
 
 use 3 kind of models
 1. linear model SGD => SVM, Logistic Regression, Least-Squares, Boosting
@@ -34,8 +35,8 @@ precision of model
 
 prezi link https://prezi.com/view/zVguYNlRvEAR8R9pjbsQ
 
-elasticsearch link  https://5ad49321f5849cb64b080b8849cb7dfb.us-west-2.aws.found.io:9243
+elasticsearch link  https://4c2e6ab8714b46f1b0067cd0f3c8d3d6.ap-northeast-1.aws.found.io:9243
 
-    username wine passwd lifestyle
+    username wine passwd recruit
 
-   find the wine_data_basic dashboard
+   find the wine_train_set_basic_distribution dashboard
