@@ -40,3 +40,4 @@ elasticsearch link  https://4c2e6ab8714b46f1b0067cd0f3c8d3d6.ap-northeast-1.aws.
     username wine passwd recruit
 
    find the wine_train_set_basic_distribution dashboard
+
