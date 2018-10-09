@@ -4,7 +4,7 @@ use wine training data to forecast the test data's quality
 use two kind of predict ways
 1. 2 - values    quality > 6 => 1  quality <= 6 => 0
 2. 7 - values from 3 to 9 
-3. ~~minimum-deviation~~ it is a pretty good way to measure result like price prediction, etc.. but I do not think it's good way to measure like rank judging
+3. ~~minimum-deviation~~ it is a pretty good way to measure result like price prediction, etc.. but I do not think it's good way to measure result of rank judging
 
 use 3 kind of models
 1. linear model SGD => SVM, Logistic Regression, Least-Squares, Boosting
